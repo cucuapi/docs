@@ -1,0 +1,41 @@
+# Requisitos
+
+| Requisito           | Descripción                                                                                                                                                 | Generado por                                                             |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| NIT                 | Número de identificación de actividad comercial, necesario para obtener credenciales en el SIN (Sistema Impuestos Nacionales).                              | Impuestos                                                                |
+| Certificado Digital | En caso de realizarse la modalidad de facturación electrónica en línea se necesitara los certificados respectivos asociados a los reguladores de los mismos | [digicert](https://www.digicert.bo/) o [ADSIB](https://firmadigital.bo/) |
+
+## Configuración del Sistema
+
+Parametros para inicializar el sistema.
+
+| Parámetro         | Tipo   | Requerido | Descripción                                          |
+| ----------------- | ------ | --------- | ---------------------------------------------------- |
+| NIT               | String | Si        | Número de identificación de actividad comercial.     |
+| Código de Sistema | String | Si        | Código de sistema provisto por el SIN                |
+| Modalidad         | Int    | Si        | Tipo de modalidad electrónica (1), computarizada (2) |
+| Razón Social      | String | Si        | Nombre o razón social de la empresa                  |
+| Token             | String | Si        | Token generado por el SIN                            |
+| Dirección         | String | Si        | Dirección de ubicación de la empresa                 |
+| Email             | String | Si        | Correo electrónico de la empresa                     |
+| Teléfono          | String | Si        | Teléfono de la empresa                               |
+| Municipio         | String | Si        | Nombre del municipio de la empresa                   |
+
+<Note>
+El Token debe ser generado en la pagina del [SIN](https://pilotosiat.impuestos.gob.bo/Autenticacion/index.xhtml), en caso de expirar se mostrará el siguiente mensaje.
+</Note>
+
+```json
+{
+  "message": "RENEW TOKEN SIN",
+  "errors": [
+    {
+      "expireDate": 1640908800000,
+      "nit": 68*****012,
+      "active": false
+    }
+  ],
+  "data": null,
+  "success": false
+}
+```

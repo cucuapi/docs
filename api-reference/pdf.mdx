@@ -1,0 +1,81 @@
+## Formato PDF
+
+Ruta pública para ver en formato gráfico de la factura necesitamos los campos `code` y `client`.  
+Estos se obtendrán al momento de generar la factura en la respuesta de la emisión de la factura.  
+Ejemplo para recuperar los campos desde `invoiceUrl`:
+
+```js
+const invoiceUrl = "/pdf?code=A1C44C93BY5XHTIHLCLdWewbb921&client=YIVS45VXD60F505GRB2A";
+const pdfPublic = (invoiceUrl) => {
+  return {
+    code: invoiceUrl.slice(10, 38),
+    client: invoiceUrl.slice(46),
+  };
+};
+```
+
+:::note
+El campo `invoiceUrl` contendrá la misma longitud en caso de que requiera guardar los campos públicos de la factura para poder enviar el link de **cucu** por email externo.
+:::
+
+```http
+GET https://sandbox.cucu.bo/pdf?code={code}&client={client}
+```
+
+| Parámetro | Tipo   | Requerido | Descripción                    |
+|-----------|--------|-----------|--------------------------------|
+| `code`    | String | Sí        | Código público de la factura   |
+| `client`  | String | Sí        | Código público del cliente     |
+
+## Factura de compra y venta
+
+<img
+    className="hidden dark:block w-[600px] h-auto border border-gray-200"
+    src="/images/compra-venta.png"
+    alt="Hero Dark"
+/>
+
+## Nota de debito crédito
+
+<img
+    className="hidden dark:block w-[600px] h-auto border border-gray-200"
+    src="/images/nota-debito.png"
+    alt="Hero Dark"
+/>
+## Factura de compra y venta bonificaciones
+
+<img
+    className="hidden dark:block w-[600px] h-auto border border-gray-200"
+    src="/images/bonificaciones.png"
+    alt="Hero Dark"
+/>
+## Factura Tasa Cero por venta de Libros y Transporte Internacional
+
+<img
+    className="hidden dark:block w-[600px] h-auto border border-gray-200"
+    src="/images/rate.png"
+    alt="Hero Dark"
+/>
+## Factura Comercial de Exportación de Servicios
+
+<img
+    className="hidden dark:block w-[600px] h-auto border border-gray-200"
+    src="/images/export.png"
+    alt="Hero Dark"
+/>
+## Factura Hospitales/Clínicas
+
+<img
+    className="hidden dark:block w-[600px] h-auto border border-gray-200"
+    src="/images/hospital.png"
+    alt="Hero Dark"
+/>
+
+## Factura Venta Zona Franca
+
+<img
+    className="hidden dark:block w-[600px] h-auto border border-gray-200"
+    src="/images/free-zone.png"
+    alt="Hero Dark"
+/>
+

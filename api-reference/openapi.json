@@ -1,90 +1,59 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
+    "title": "API Facturación Electrónica",
+    "description": "API para generación de facturas electrónicas con validación ante el SIN",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
+      "url": "https://sandbox.cucu.bo/api/v1"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/auth/login": {
+      "post": {
+        "summary": "Login al Sistema Api CUCU",
+        "description": "Endpoint para obtener token de acceso mediante credenciales",
+        "tags": [
+          "Autenticación"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              },
+              "example": {
+                "username": "api.electro",
+                "password": "R10V8jpxPm4akFHCacS7kWkCqRy"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Login Succes",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/AuthResponse"
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "token": "eyJhbGciOiJIUzUxMiJ......",
+                    "username": "api.electro"
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
+            "description": "Credenciales inválidas",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +65,184 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/branchOffice": {
+      "post": {
+        "summary": "Crear una nueva sucursal",
+        "description": "Endpoint para registrar una nueva sucursal",
+        "tags": [
+          "Sucursales"
+        ],
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchOfficeRequest"
+              },
+              "example": {
+                "name": "CUCU",
+                "municipality": "MURILLO",
+                "address": "Calle de las loma #15323",
+                "city": "LA PAZ",
+                "phone": "12345678",
+                "description": "CUCU ELECTRONICA SUCURSAL TEST"
+              }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucursal creada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchOfficeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Actualizar una sucursal",
+        "description": "Endpoint para modificar los datos de una sucursal existente",
+        "tags": [
+          "Sucursales"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchOfficeUpdateRequest"
+              },
+              "example": {
+                "name": "CUCU ELECTRONICA TEST",
+                "municipality": "LA PAZ",
+                "address": "Calle de loma #15323",
+                "city": "LA PAZ",
+                "phone": "1234567",
+                "description": "SUCURSAL:1",
+                "branchId": 1,
+                "posId": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucursal actualizada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchOfficeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sucursal no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Obtener todas las sucursales",
+        "description": "Endpoint para listar todas las sucursales registradas",
+        "tags": [
+          "Sucursales"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Listado de sucursales obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchOfficeListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/branchOffice/{branchId}": {
+      "get": {
+        "summary": "Obtener una sucursal específica",
+        "description": "Endpoint para consultar los datos de una sucursal por su ID",
+        "tags": [
+          "Sucursales"
+        ],
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la sucursal a consultar"
           },
-          "400": {
-            "description": "unexpected error",
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos de la sucursal obtenidos exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchOfficeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sucursal no encontrada",
             "content": {
               "application/json": {
                 "schema": {
@@ -128,89 +253,4653 @@
           }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/pos": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "summary": "Crear un nuevo punto de venta",
+        "description": "Endpoint para registrar un nuevo punto de venta (POS)",
+        "tags": [
+          "Puntos de Venta"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/CreatePOSRequest"
+              },
+              "example": {
+                "siatTypePos": 2,
+                "branchId": 2,
+                "siatDescription": "PUNTO DE VENTA PRUEBAS",
+                "posName": "PUNTO DE VENTA PRUEBA",
+                "name": "PUNTO DE VENTA"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Punto de venta creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/POSResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Obtener todos los puntos de venta",
+        "description": "Endpoint para listar todos los puntos de venta por sucursal",
+        "tags": [
+          "Puntos de Venta"
+        ],
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la sucursal para filtrar los POS"
+          },
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listado de puntos de venta obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/POSListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pos/regenerate/{branchId}": {
+      "get": {
+        "summary": "Regenerar puntos de venta",
+        "description": "Endpoint para regenerar los puntos de venta de una sucursal",
+        "tags": [
+          "Puntos de Venta"
+        ],
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la sucursal cuyos POS se regenerarán"
+          },
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Puntos de venta regenerados exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/POSRegenerateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sucursal no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog": {
+      "post": {
+        "summary": "Sincronizar todos los catálogos",
+        "description": "Endpoint para sincronizar todos los catálogos del SIN",
+        "tags": [
+          "Catálogos"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogSyncRequest"
+              },
+              "example": {
+                "posId": 1,
+                "branchId": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Catálogos sincronizados exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogFullResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los parámetros de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Filtrar catálogos",
+        "description": "Endpoint para obtener catálogos específicos por agrupador o todos los catálogos",
+        "tags": [
+          "Catálogos"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "posId": {
+                    "type": "integer",
+                    "description": "ID del punto de venta"
+                  },
+                  "branchId": {
+                    "type": "integer",
+                    "description": "ID de la sucursal (default: 1 si no se especifica)",
+                    "default": 1
+                  },
+                  "groupId": {
+                    "type": "integer",
+                    "enum": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      13,
+                      14,
+                      15,
+                      16,
+                      17
+                    ],
+                    "description": "ID del agrupador para filtrar (opcional)"
+                  }
+                },
+                "required": [
+                  "posId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Catálogos obtenidos exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CatalogFullResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CatalogGroupResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/config": {
+      "post": {
+        "summary": "Configurar visualización de factura",
+        "description": "Método para configurar los colores, fuentes y bordes de la factura",
+        "tags": [
+          "Facturación"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceConfigRequest"
+              },
+              "example": {
+                "colorPrimary": "#ff5729",
+                "colorBorder": "#ff972a",
+                "colorShadow": "#ffffef",
+                "fontType": 2,
+                "isBorder": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Configuración actualizada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceConfigResponse"
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "colorPrimary": "#ff5729",
+                    "colorBorder": "#ff972a",
+                    "colorShadow": "#ffffef",
+                    "logo": null,
+                    "fontType": "COURIER_STD",
+                    "isBorder": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Actualizar configuración de factura",
+        "description": "Método para actualizar los parámetros de visualización de factura",
+        "tags": [
+          "Facturación"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Configuración actualizada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceConfigResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/config/upload": {
+      "post": {
+        "summary": "Subir logo para factura",
+        "description": "Método para cargar el logo de la empresa en formato PNG o JPG",
+        "tags": [
+          "Facturación"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo de imagen (PNG o JPG)"
+                  }
+                },
+                "required": [
+                  "logo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logo cargado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceConfigResponse"
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "colorPrimary": "#5a189a",
+                    "colorBorder": "#ccff33",
+                    "colorShadow": "#8ec52b",
+                    "logo": null,
+                    "fontType": "OVERPASS",
+                    "isBorder": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/config/digitalSign": {
+      "post": {
+        "summary": "Actualizar firma digital y llave privada",
+        "description": "Método para cargar los certificados de firma digital",
+        "tags": [
+          "Facturación"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "privateKey": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo de llave privada (.pem)"
+                  },
+                  "cert": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo de certificado (.crt)"
+                  }
+                },
+                "required": [
+                  "privateKey",
+                  "cert"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Certificados actualizados exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "privateKey": {
+                          "type": "string",
+                          "enum": [
+                            "YES",
+                            "NO"
+                          ]
+                        },
+                        "cert": {
+                          "type": "string",
+                          "enum": [
+                            "YES",
+                            "NO"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "privateKey": "YES",
+                    "cert": "YES"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/company/updateToken": {
+      "post": {
+        "summary": "Actualizar token de compañía",
+        "description": "Método para actualizar el token SIN de la compañía",
+        "tags": [
+          "Compañía"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sinToken": {
+                    "type": "string",
+                    "description": "Token SIN de la compañía"
+                  }
+                },
+                "required": [
+                  "sinToken"
+                ]
+              },
+              "example": {
+                "sinToken": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/codes/cleanCache": {
+      "post": {
+        "summary": "Limpiar caché de códigos",
+        "description": "Método para limpiar la caché interna de códigos",
+        "tags": [
+          "Códigos"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Caché limpiada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/pagination": {
+      "get": {
+        "summary": "Listado paginado de facturas",
+        "description": "Obtiene un listado paginado de facturas con información básica",
+        "tags": [
+          "Facturas"
+        ],
+        "parameters": [
+          {
+            "name": "posId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del punto de venta"
+          },
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          },
+          {
+            "name": "branchId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la sucursal"
+          },
+          {
+            "name": "docSector",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Código documento sector"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Número de página"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Número de items por página"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listado de facturas obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoicePaginationResponse"
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "totalItems": 8,
+                    "totalPages": 2,
+                    "limit": 4,
+                    "page": 1,
+                    "prevPage": 0,
+                    "nextPage": null,
+                    "result": [
+                      {
+                        "invoiceNumber": 6,
+                        "code": "D6A0D688",
+                        "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A5306B1BECF34A7439337C4DDF109A7C15F3E0ED2810EC74&numero=6&t=1",
+                        "urlInvoice": "https://sandbox.cucu.bo/pdf?code=D6A0D688",
+                        "siatCodeState": 690,
+                        "typeDocSector": 1
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/xml": {
+      "get": {
+        "summary": "Obtener factura en formato XML",
+        "description": "Recupera una factura específica en formato XML",
+        "tags": [
+          "Facturas"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestParams"
+              },
+              "example": {
+                "posId": 1,
+                "invoiceNumber": 1026,
+                "invoiceCode": "6D1B7B5D"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura XML obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceXMLResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/json": {
+      "get": {
+        "summary": "Obtener factura en formato JSON",
+        "description": "Recupera una factura específica en formato JSON",
+        "tags": [
+          "Facturas"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura JSON obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceJSONResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/pdf": {
+      "get": {
+        "summary": "Obtener factura en formato PDF (base64)",
+        "description": "Recupera una factura específica en formato PDF codificado en base64",
+        "tags": [
+          "Facturas"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura PDF obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoicePDFResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/sale": {
+      "post": {
+        "summary": "Genera una factura electrónica de venta",
+        "description": "Endpoint para la emisión de facturas electrónicas de compra y venta con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequest"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "CONTROL TRIBUTARIO",
+                "clientDocumentType": 3,
+                "clientNroDocument": 99002,
+                "clientCode": "407464025",
+                "paramPaymentMethod": 2,
+                "userPos": "USR_CUCU",
+                "typeInvoice": 1,
+                "paramCurrency": 1,
+                "numberCard": "1111000044446666",
+                "clientCity": "La Paz",
+                "clientEmail": "nicolas.sandoval@energia-simple.com",
+                "observations": "CUCU API Solutions | AWS AI | ODOO | SIAT | DATA BASES | DOCKER | LINUX SERVERS | AI | REST API",
+                "exchangeRate": 6.97,
+                "amountUsd": 401.72,
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 71,
+                    "codeProductSin": 83143,
+                    "codeProduct": "API-CUCU",
+                    "description": "Implementacion SFE Sistema de Facturación Electrónica Odoo AWS - API REST",
+                    "qty": 1,
+                    "priceUnit": 2
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "D6A0D688",
+                    "cuf": "1D2C888524*****************1B887CDFDC74",
+                    "invoiceNumber": 1,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A53036C3A38518F1E3AA21C963E8606A883D1B887CDFDC74&numero=1&t=1",
+                    "invoiceUrl": "/pdf?code=DC3E4E6TUWxbaS36JJ0w3iOcmlfb&client=10T9ATSWLFY5GOFRETODKH6BF",
+                    "dateEmission": "2021-12-13T20:46:54.305",
+                    "amountTotal": 2580.0,
+                    "amountTotalDiscount": 10.0,
+                    "amountTotalCurrency": 2580.0,
+                    "userCashier": "S4INC12ABCX",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "2b10887***********a**e133**f60",
+                    "siatDescriptionStatus": "accepted",
+                    "countItems": 2,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/sale/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de venta",
+        "description": "Endpoint para la anulación de facturas electrónicas de compra y venta con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/sale/revert": {
+      "post": {
+        "summary": "Revierte una factura anulada electrónica de venta",
+        "description": "Endpoint para la reversión de facturas electrónicas anuladas de compra y venta con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRevert"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 3514,
+                    "cuf": "1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74",
+                    "siatCodeState": 907,
+                    "siatDescriptionStatus": "REVERSION DE ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74&numero=3514&t=2",
+                    "invoiceCode": "42FE88BD"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/saleBon": {
+      "post": {
+        "summary": "Genera una factura electrónica de venta",
+        "description": "Endpoint para la emisión de facturas electrónicas de compra y venta bonificaciones con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequest"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "CLIENTE TEST",
+                "clientDocumentType": 1,
+                "clientNroDocument": 123456789,
+                "clientCode": "CLIENTE2-TEST",
+                "paramPaymentMethod": 1,
+                "userPos": "S4INC12ABCX",
+                "typeInvoice": 1,
+                "paramCurrency": 1,
+                "clientComplement": 1,
+                "clientCity": "Santa Cruz",
+                "clientEmail": "cliente@gmail.com",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 11,
+                    "codeProductSin": 83141,
+                    "codeProduct": "CC-SRVSISCLOUD123",
+                    "description": "IMPLEMENTACIÓN DE SISTEMAS EN LA NUBE",
+                    "qty": 2,
+                    "priceUnit": 1000
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "D6A0D688",
+                    "cuf": "1D2C888524*****************1B887CDFDC74",
+                    "invoiceNumber": 1,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A53036C3A38518F1E3AA21C963E8606A883D1B887CDFDC74&numero=1&t=1",
+                    "invoiceUrl": "/pdf?code=DC3E4E6TUWxbaS36JJ0w3iOcmlfb&client=10T9ATSWLFY5GOFRETODKH6BF",
+                    "dateEmission": "2021-12-13T20:46:54.305",
+                    "amountTotal": 2580.0,
+                    "amountTotalDiscount": 10.0,
+                    "amountTotalCurrency": 2580.0,
+                    "userCashier": "S4INC12ABCX",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "2b10887***********a**e133**f60",
+                    "siatDescriptionStatus": "accepted",
+                    "countItems": 2,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0025,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/saleBon/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de compra y venta bonificaciones",
+        "description": "Endpoint para la anulación de facturas electrónicas de compra y venta bonificaciones con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/saleBon/revert": {
+      "post": {
+        "summary": "Revierte una factura anulada electrónica de venta bonficaciones",
+        "description": "Endpoint para la reversión de facturas electrónicas anuladas de compra y venta bonificaciones con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRevert"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 3514,
+                    "cuf": "1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74",
+                    "siatCodeState": 907,
+                    "siatDescriptionStatus": "REVERSION DE ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74&numero=3514&t=2",
+                    "invoiceCode": "42FE88BD"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/rate": {
+      "post": {
+        "summary": "Genera una factura electrónica de Tasa Cero por venta de Libros y Transporte Internacional de carga",
+        "description": "Genera una factura electrónica de Tasa Cero por venta de Libros y Transporte Internacional de carga con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRate"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "VIDAURRE",
+                "clientDocumentType": 5,
+                "clientNroDocument": "1410245015",
+                "exceptionCode": 1,
+                "clientCode": "ADMINCLIENT",
+                "clientComplement": null,
+                "clientEmail": "normmy@gmail.com",
+                "clientPhone": "123123123",
+                "paramPaymentMethod": 27,
+                "userPos": "USRTESTB341",
+                "paramCurrency": "1",
+                "clientCity": "SANTA CRUZ",
+                "exchangeRate": 8.31,
+                "amountUsd": 178.16,
+                "additionalDiscount": 1,
+                "giftCard": 2,
+                "observations": "observations",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 62,
+                    "codeProductSin": 83141,
+                    "codeProduct": "PAGOS-F12907",
+                    "description": "PAGO DE MATRICULA",
+                    "qty": 44,
+                    "priceUnit": 8.3
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED_RATE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "FDA62098",
+                    "cuf": "1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74",
+                    "invoiceNumber": 14,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74&numero=14&t=2",
+                    "invoiceUrl": "/pdf?code=FDA62098zE5zDVSS4AVTk1RlQjuq&client=V0K9O3URC2849MOQ7Z4PI48B3",
+                    "dateEmission": "2024-12-21T16:11:41.805",
+                    "amountTotal": 0.0,
+                    "amountTotalDiscount": 1.0,
+                    "amountTotalCurrency": 364.2,
+                    "userCashier": "USRTESTB341",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "cb43167f-bfd7-11ef-9792-874b9ca9eb03",
+                    "siatDescriptionStatus": "VALIDADA",
+                    "countItems": 1,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0025,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/rate/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de venta",
+        "description": "Endpoint para la anulación de facturas electrónicas de Tasa Cero por venta de Libros y Transporte Internacional de carga con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/rate/revert": {
+      "post": {
+        "summary": "Revierte una factura anulada electrónica de tasa cero",
+        "description": "Endpoint para la reversión de facturas electrónicas anuladas de Tasa Cero por venta de Libros y Transporte Internacional de carga con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRevert"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 3514,
+                    "cuf": "1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74",
+                    "siatCodeState": 907,
+                    "siatDescriptionStatus": "REVERSION DE ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74&numero=3514&t=2",
+                    "invoiceCode": "42FE88BD"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/freeZone": {
+      "post": {
+        "summary": "Genera una factura electrónica de Venta Zona Franca",
+        "description": "Genera una factura electrónica para transacciones por bienes o servicios realizados al interior de zonas francas en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestFreeZone"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "VIDAURRE",
+                "clientDocumentType": 5,
+                "clientNroDocument": "1410245015",
+                "exceptionCode": 1,
+                "clientCode": "ADMINCLIENT",
+                "clientComplement": null,
+                "clientEmail": "normmy@gmail.com",
+                "clientPhone": "123123123",
+                "paramPaymentMethod": 27,
+                "userPos": "USRTESTB341",
+                "paramCurrency": "1",
+                "clientCity": "SANTA CRUZ",
+                "exchangeRate": 8.31,
+                "amountUsd": 178.16,
+                "additionalDiscount": 1,
+                "giftCard": 2,
+                "observations": "observations",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 62,
+                    "codeProductSin": 83141,
+                    "codeProduct": "PAGOS-F12907",
+                    "description": "PAGO DE MATRICULA",
+                    "qty": 44,
+                    "priceUnit": 8.3
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "FDA62098",
+                    "cuf": "1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74",
+                    "invoiceNumber": 14,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74&numero=14&t=2",
+                    "invoiceUrl": "/pdf?code=FDA62098zE5zDVSS4AVTk1RlQjuq&client=V0K9O3URC2849MOQ7Z4PI48B3",
+                    "dateEmission": "2024-12-21T16:11:41.805",
+                    "amountTotal": 0.0,
+                    "amountTotalDiscount": 1.0,
+                    "amountTotalCurrency": 364.2,
+                    "userCashier": "USRTESTB341",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "cb43167f-bfd7-11ef-9792-874b9ca9eb03",
+                    "siatDescriptionStatus": "VALIDADA",
+                    "countItems": 1,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0025,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/freeZone/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de Venta Zona Franca",
+        "description": "Endpoint para la anulación de facturas electrónicas de Venta Zona Franca con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/freeZone/revert": {
+      "post": {
+        "summary": "Revierte una factura anulada electrónica de Venta Zona Franca",
+        "description": "Endpoint para la reversión de facturas electrónicas anuladas de Venta Zona Franca con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRevert"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura revertida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 3514,
+                    "cuf": "1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74",
+                    "siatCodeState": 907,
+                    "siatDescriptionStatus": "REVERSION DE ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74&numero=3514&t=2",
+                    "invoiceCode": "42FE88BD"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/exportService": {
+      "post": {
+        "summary": "Genera una factura electrónica de Comercial de Exportación de Servicios",
+        "description": "Genera una factura electrónica para transacciones de exportación de servicios en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestExportServices"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "VIDAURRE",
+                "clientDocumentType": 5,
+                "clientNroDocument": "1410245015",
+                "exceptionCode": 1,
+                "clientCode": "ADMINCLIENT",
+                "clientComplement": null,
+                "clientEmail": "normmy@gmail.com",
+                "clientPhone": "123123123",
+                "paramPaymentMethod": 27,
+                "userPos": "USRTESTB341",
+                "paramCurrency": "1",
+                "clientCity": "SANTA CRUZ",
+                "exchangeRate": 8.31,
+                "amountUsd": 178.16,
+                "additionalDiscount": 1,
+                "giftCard": 2,
+                "observations": "observations",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 62,
+                    "codeProductSin": 83141,
+                    "codeProduct": "PAGOS-F12907",
+                    "description": "PAGO DE MATRICULA",
+                    "qty": 44,
+                    "priceUnit": 8.3
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED_RATE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "FDA62098",
+                    "cuf": "1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74",
+                    "invoiceNumber": 14,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74&numero=14&t=2",
+                    "invoiceUrl": "/pdf?code=FDA62098zE5zDVSS4AVTk1RlQjuq&client=V0K9O3URC2849MOQ7Z4PI48B3",
+                    "dateEmission": "2024-12-21T16:11:41.805",
+                    "amountTotal": 0.0,
+                    "amountTotalDiscount": 1.0,
+                    "amountTotalCurrency": 364.2,
+                    "userCashier": "USRTESTB341",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "cb43167f-bfd7-11ef-9792-874b9ca9eb03",
+                    "siatDescriptionStatus": "VALIDADA",
+                    "countItems": 1,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0025,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/exportService/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de Comercial de Exportación de Servicios",
+        "description": "Endpoint para la anulación de facturas electrónicas de Comercial de Exportación de Servicios con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/exportService/revert": {
+      "post": {
+        "summary": "Revierte una factura anulada electrónica  de Comercial de Exportación de Servicios",
+        "description": "Endpoint para la reversión de facturas electrónicas anuladas  de Comercial de Exportación de Servicios con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRevert"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura revertida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 3514,
+                    "cuf": "1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74",
+                    "siatCodeState": 907,
+                    "siatDescriptionStatus": "REVERSION DE ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74&numero=3514&t=2",
+                    "invoiceCode": "42FE88BD"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/hospital": {
+      "post": {
+        "summary": "Genera una factura electrónica de Hospitales/Clínicas",
+        "description": "Genera una factura electrónica para hospitales y clínicas, deberá incluir información de los pacientes y médicos cuando sea una intervención quirúrgica en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestHospital"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "VIDAURRE",
+                "clientDocumentType": 5,
+                "clientNroDocument": "1410245015",
+                "exceptionCode": 1,
+                "clientCode": "ADMINCLIENT",
+                "clientComplement": null,
+                "clientEmail": "normmy@gmail.com",
+                "clientPhone": "123123123",
+                "paramPaymentMethod": 27,
+                "userPos": "USRTESTB341",
+                "paramCurrency": "1",
+                "clientCity": "SANTA CRUZ",
+                "exchangeRate": 8.31,
+                "amountUsd": 178.16,
+                "additionalDiscount": 1,
+                "giftCard": 2,
+                "observations": "observations",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 62,
+                    "codeProductSin": 83141,
+                    "codeProduct": "PAGOS-F12907",
+                    "description": "PAGO DE MATRICULA",
+                    "qty": 44,
+                    "priceUnit": 8.3
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED_HOSPITAL",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "FDA62098",
+                    "cuf": "1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74",
+                    "invoiceNumber": 14,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74&numero=14&t=2",
+                    "invoiceUrl": "/pdf?code=FDA62098zE5zDVSS4AVTk1RlQjuq&client=V0K9O3URC2849MOQ7Z4PI48B3",
+                    "dateEmission": "2024-12-21T16:11:41.805",
+                    "amountTotal": 0.0,
+                    "amountTotalDiscount": 1.0,
+                    "amountTotalCurrency": 364.2,
+                    "userCashier": "USRTESTB341",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "cb43167f-bfd7-11ef-9792-874b9ca9eb03",
+                    "siatDescriptionStatus": "VALIDADA",
+                    "countItems": 1,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0025,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/hospital/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de Comercial de Exportación de Servicios",
+        "description": "Endpoint para la anulación de facturas electrónicas de Comercial de Exportación de Servicios con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_HOSPITAL",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/hospital/revert": {
+      "post": {
+        "summary": "Revierte una factura anulada electrónica de Hospitales/Clínicas",
+        "description": "Endpoint para la reversión de facturas electrónicas anuladas de Hospitales/Clínicas con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRevert"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 3514,
+                    "cuf": "1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74",
+                    "siatCodeState": 907,
+                    "siatDescriptionStatus": "REVERSION DE ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74&numero=3514&t=2",
+                    "invoiceCode": "42FE88BD"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/debit": {
+      "post": {
+        "summary": "Genera una Nota debito Crédito",
+        "description": "Genera una Nota Crédito y Débito Fiscal de los Sujetos Pasivos o compradores con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestDebit"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "VIDAURRE",
+                "clientDocumentType": 5,
+                "clientNroDocument": "1410245015",
+                "exceptionCode": 1,
+                "clientCode": "ADMINCLIENT",
+                "clientComplement": null,
+                "clientEmail": "normmy@gmail.com",
+                "clientPhone": "123123123",
+                "paramPaymentMethod": 27,
+                "userPos": "USRTESTB341",
+                "paramCurrency": "1",
+                "clientCity": "SANTA CRUZ",
+                "exchangeRate": 8.31,
+                "amountUsd": 178.16,
+                "additionalDiscount": 1,
+                "giftCard": 2,
+                "observations": "observations",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 62,
+                    "codeProductSin": 83141,
+                    "codeProduct": "PAGOS-F12907",
+                    "description": "PAGO DE MATRICULA",
+                    "qty": 44,
+                    "priceUnit": 8.3
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED_HOSPITAL",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "FDA62098",
+                    "cuf": "1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74",
+                    "invoiceNumber": 14,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74&numero=14&t=2",
+                    "invoiceUrl": "/pdf?code=FDA62098zE5zDVSS4AVTk1RlQjuq&client=V0K9O3URC2849MOQ7Z4PI48B3",
+                    "dateEmission": "2024-12-21T16:11:41.805",
+                    "amountTotal": 0.0,
+                    "amountTotalDiscount": 1.0,
+                    "amountTotalCurrency": 364.2,
+                    "userCashier": "USRTESTB341",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "cb43167f-bfd7-11ef-9792-874b9ca9eb03",
+                    "siatDescriptionStatus": "VALIDADA",
+                    "countItems": 1,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0025,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/debit/anulation": {
+      "post": {
+        "summary": "Anula una Nota debito crédito",
+        "description": "Endpoint para la anulación de Notas Debito Crédito en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_HOSPITAL",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event/start": {
+      "post": {
+        "summary": "Iniciar evento significativo",
+        "description": "Registra un evento significativo (contingencia) en el sistema de facturación",
+        "tags": [
+          "Eventos Significativos"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartEventRequest"
+              },
+              "examples": {
+                "sinCAFC": {
+                  "value": {
+                    "posId": 1,
+                    "codeMotive": 1,
+                    "description": "TEST INVOICE EDU"
+                  }
+                },
+                "conCAFC": {
+                  "value": {
+                    "posId": 1,
+                    "codeMotive": 5,
+                    "dateInitEvent": "2022-07-05T13:34:12",
+                    "dateEndEvent": "2022-07-05T16:00:18",
+                    "description": "TEST INVOICE"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Evento iniciado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponse"
+                },
+                "examples": {
+                  "sinCAFC": {
+                    "value": {
+                      "message": "COMPLETED",
+                      "errors": null,
+                      "success": true,
+                      "data": {
+                        "description": "TEST INVOICE EDU",
+                        "descriptionMotive": "CORTE DEL SERVICIO DE INTERNET",
+                        "eventCode": "XM8VYT1I4FUIPSQM",
+                        "dateInitEvent": "2022-04-21T16:06:07.136",
+                        "dateEndEvent": null,
+                        "siatReceptionCode": null,
+                        "cufEvent": "BQUFVQnVVOkdBNz0U2RTU3MkM2REY=Q3nCrHpCTldFV1VFGMjQxREZDMERCQ",
+                        "controlCodeEvent": "0BE7EBAAAD56D74",
+                        "cafc": "134E1F5FE954D",
+                        "codeMotive": 5,
+                        "isEndEvent": null,
+                        "pack": null
+                      }
+                    }
+                  },
+                  "conCAFC": {
+                    "value": {
+                      "message": "COMPLETED",
+                      "errors": null,
+                      "success": true,
+                      "data": {
+                        "description": "TEST INVOICE",
+                        "descriptionMotive": "CORTE DE SUMINISTRO DE ENERGIA ELECTRICA",
+                        "eventCode": "EOFY3RE8ILUIJSNG",
+                        "dateInitEvent": "2022-07-05T13:34:12",
+                        "dateEndEvent": "2022-07-05T16:00:18",
+                        "siatReceptionCode": null,
+                        "cufEvent": "BQUtDJVpCQkE=NzjQ2MTVBMDQ5NTc=QmV7TGlOR0hXVUFFFNzg3RDlDMEZGQ",
+                        "controlCodeEvent": "359DB59ACF96D74",
+                        "cafc": "101F62C692B4D",
+                        "codeMotive": 5,
+                        "isEndEvent": null,
+                        "pack": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event/end": {
+      "post": {
+        "summary": "Finalizar evento significativo",
+        "description": "Registra la finalización de un evento significativo (contingencia)",
+        "tags": [
+          "Eventos Significativos"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndEventRequest"
+              },
+              "example": {
+                "posId": 1,
+                "eventCode": "1IQIZ3G1KHYHGQ"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Evento finalizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndEventResponse"
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": [
+                    {
+                      "packageId": 6,
+                      "siatStatusDescription": "VALIDADA",
+                      "siatStatus": 908,
+                      "siatCodeReception": "396f5d6f-c0eb-11ec-8238-859ee1bceb21",
+                      "docSector": 1,
+                      "typeInvoice": 1,
+                      "process": true,
+                      "posId": 120,
+                      "branchId": 0,
+                      "crc32": [
+                        "CF088B9A"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/email": {
+      "post": {
+        "summary": "Envío de factura por email",
+        "description": "Permite enviar la factura en formato PDF y XML con firma digital al correo electrónico especificado",
+        "tags": [
+          "Email"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              },
+              "example": {
+                "invoiceCode": "79338BF1",
+                "sendEmail": "cucu@gmail.com",
+                "subject": "EMAIL DE PRUEBA SIN VERIFICACION"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email enviado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailResponse"
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "sendEmail": "cucu@gmail.com",
+                    "subject": "EMAIL DE PRUEBA SIN VERIFICACION",
+                    "invoiceCode": "79338BF1",
+                    "cuf": "1D2C888524A5306504D4C336004579DC0792A84E3617C306BDE310EC74",
+                    "invoiceNumber": "15"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/debit/revert": {
+      "post": {
+        "summary": "Revierte una nota debito credito",
+        "description": "Endpoint para la reversión de Notas Debito Crédito con validación en tiempo real ante el SIN",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContentTypeHeader"
+          },
+          {
+            "$ref": "#/components/parameters/CucukeyHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRevert"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 3514,
+                    "cuf": "1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74",
+                    "siatCodeState": 907,
+                    "siatDescriptionStatus": "REVERSION DE ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A69962981C8A7D4A01B61C2C8348E7042101A881E9749E74&numero=3514&t=2",
+                    "invoiceCode": "42FE88BD"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
     }
   },
   "components": {
+    "parameters": {
+      "ContentTypeHeader": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "application/json",
+          "default": "application/json"
+        },
+        "description": "Debe ser siempre 'application/json'"
+      },
+      "CucukeyHeader": {
+        "name": "cucukey",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Token obtenido del login. Formato: 'Token <valor>'",
+          "example": "Token abc123def456",
+          "default": "Token eyJhbGciOiJIUzUxMiJ9..."
+        }
+      }
+    },
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "AuthRequest": {
         "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "username": {
+            "type": "string",
+            "description": "Usuario asignado por CUCU",
+            "example": "api.electro"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "password": {
+            "type": "string",
+            "description": "Contraseña asignada por CUCU",
+            "format": "password",
+            "example": "securePassword123",
+            "writeOnly": true
           }
         }
       },
-      "NewPlant": {
+      "BranchOfficeRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "municipality",
+          "address",
+          "city",
+          "phone",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre de la sucursal (si es la primera será 'CASA MATRIZ' por defecto)",
+            "example": "CUCU"
+          },
+          "municipality": {
+            "type": "string",
+            "description": "Nombre del municipio",
+            "example": "MURILLO"
+          },
+          "address": {
+            "type": "string",
+            "description": "Dirección de ubicación",
+            "example": "Calle de las loma #15323"
+          },
+          "city": {
+            "type": "string",
+            "description": "Nombre de la ciudad",
+            "example": "LA PAZ"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Teléfono o celular",
+            "example": "12345678"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción detallada",
+            "example": "CUCU ELECTRONICA SUCURSAL TEST"
+          }
+        }
+      },
+      "BranchOfficeUpdateRequest": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/Plant"
+            "$ref": "#/components/schemas/BranchOfficeRequest"
           },
           {
-            "required": [
-              "id"
-            ],
             "type": "object",
+            "required": [
+              "branchId"
+            ],
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
+              "branchId": {
                 "type": "integer",
-                "format": "int64"
+                "description": "ID de la sucursal a actualizar",
+                "example": 1
+              },
+              "posId": {
+                "type": "integer",
+                "description": "ID del punto de venta asociado",
+                "example": 1
               }
             }
           }
         ]
       },
-      "Error": {
+      "BranchOfficeResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "COMPLETED"
+          },
+          "errors": {
+            "type": "null"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "siatCode": {
+                "type": "integer",
+                "description": "Código SIAT autogenerado",
+                "example": 0
+              },
+              "name": {
+                "type": "string",
+                "example": "CASA MATRIZ"
+              },
+              "municipality": {
+                "type": "string",
+                "example": "MURILLO"
+              },
+              "address": {
+                "type": "string",
+                "example": "Calle de las loma #15323"
+              },
+              "city": {
+                "type": "string",
+                "example": "LA PAZ"
+              },
+              "phone": {
+                "type": "string",
+                "example": "12345678"
+              },
+              "description": {
+                "type": "string",
+                "example": "CUCU ELECTRONICA TEST"
+              },
+              "branchId": {
+                "type": "integer",
+                "description": "ID único de la sucursal",
+                "example": 1
+              },
+              "pos": {
+                "type": "array",
+                "description": "Puntos de venta asociados",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BranchOfficeListResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "COMPLETED"
+          },
+          "errors": {
+            "type": "null"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BranchOfficeData"
+            }
+          }
+        }
+      },
+      "BranchOfficeData": {
+        "type": "object",
+        "properties": {
+          "siatCode": {
+            "type": "integer",
+            "example": 0
+          },
+          "name": {
+            "type": "string",
+            "example": "CASA MATRIZ"
+          },
+          "municipality": {
+            "type": "string",
+            "example": "Murillo"
+          },
+          "address": {
+            "type": "string",
+            "example": "Calle de las loma #15323"
+          },
+          "city": {
+            "type": "string",
+            "example": "La Paz"
+          },
+          "phone": {
+            "type": "string",
+            "example": "12345678"
+          },
+          "description": {
+            "type": "string",
+            "example": "CUCU ELECTRONICA TEST"
+          },
+          "branchId": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje de estado"
+          },
+          "errors": {
+            "type": "null",
+            "description": "Errores (null cuando es exitoso)"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Indica si la operación fue exitosa"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string",
+                "description": "Token JWT para autenticación en endpoints protegidos",
+                "example": "eyJhbGciOiJIUzUxMiJ9..."
+              },
+              "username": {
+                "type": "string",
+                "description": "Nombre de usuario autenticado",
+                "example": "api.electro"
+              }
+            }
+          }
+        }
+      },
+      "CreatePOSRequest": {
+        "type": "object",
         "required": [
-          "error",
-          "message"
+          "siatTypePos",
+          "siatDescription",
+          "name"
         ],
+        "properties": {
+          "siatTypePos": {
+            "type": "integer",
+            "description": "Código punto de venta desde catálogos (Código agrupador 15)",
+            "example": 2
+          },
+          "branchId": {
+            "type": "integer",
+            "description": "ID de la sucursal asociada",
+            "example": 2
+          },
+          "siatDescription": {
+            "type": "string",
+            "description": "Descripción o referencia del punto de venta",
+            "example": "PUNTO DE VENTA PRUEBAS"
+          },
+          "posName": {
+            "type": "string",
+            "description": "Nombre descriptivo del punto de venta",
+            "example": "PUNTO DE VENTA PRUEBA"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre oficial del punto de venta",
+            "example": "PUNTO DE VENTA"
+          }
+        }
+      },
+      "POSResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "POS_CREATED_SUCCESS"
+          },
+          "errors": {
+            "type": "null"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "PUNTO DE VENTA"
+              },
+              "siatCode": {
+                "type": "integer",
+                "description": "Código punto de venta asignado por SIN",
+                "example": 54
+              },
+              "siatDescription": {
+                "type": "string",
+                "example": "PUNTO DE VENTA PRUEBAS"
+              },
+              "siatTypePos": {
+                "type": "integer",
+                "example": 2
+              },
+              "cuis": {
+                "type": "string",
+                "nullable": true,
+                "description": "Código Único de Inicio de Sistemas"
+              },
+              "posAddress": {
+                "type": "string",
+                "nullable": true,
+                "description": "Dirección física del POS"
+              },
+              "correlativeId": {
+                "type": "string",
+                "nullable": true,
+                "description": "ID correlativo"
+              },
+              "event": {
+                "type": "string",
+                "nullable": true,
+                "description": "Evento asociado"
+              },
+              "isOnline": {
+                "type": "boolean",
+                "nullable": true,
+                "description": "Indica si el POS está en línea"
+              },
+              "posId": {
+                "type": "integer",
+                "description": "ID asignado al punto de venta",
+                "example": 49
+              }
+            }
+          }
+        }
+      },
+      "POSListResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "POS_COMPLETED"
+          },
+          "errors": {
+            "type": "null"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/POSDetail"
+            }
+          }
+        }
+      },
+      "POSRegenerateResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "REGENERATE POS"
+          },
+          "errors": {
+            "type": "null"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegeneratedPOS"
+            }
+          }
+        }
+      },
+      "BaseResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "InvoicePaginationResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "totalItems": {
+                "type": "integer"
+              },
+              "totalPages": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer"
+              },
+              "page": {
+                "type": "integer"
+              },
+              "prevPage": {
+                "type": "integer",
+                "nullable": true
+              },
+              "nextPage": {
+                "type": "integer",
+                "nullable": true
+              },
+              "result": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/InvoiceListItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InvoiceListItem": {
+        "type": "object",
+        "properties": {
+          "invoiceNumber": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "qrCode": {
+            "type": "string",
+            "format": "uri"
+          },
+          "urlInvoice": {
+            "type": "string",
+            "format": "uri"
+          },
+          "siatCodeState": {
+            "type": "integer"
+          },
+          "typeDocSector": {
+            "type": "integer"
+          }
+        }
+      },
+      "InvoiceRequestParams": {
+        "type": "object",
+        "properties": {
+          "posId": {
+            "type": "integer"
+          },
+          "branchId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "invoiceNumber": {
+            "type": "integer"
+          },
+          "invoiceCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "posId",
+          "invoiceNumber",
+          "invoiceCode"
+        ]
+      },
+      "InvoiceXMLResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "string",
+            "description": "XML de la factura"
+          }
+        }
+      },
+      "InvoiceJSONResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "cabecera": {
+                "type": "object",
+                "properties": {
+                  "nitEmisor": {
+                    "type": "integer"
+                  },
+                  "razonSocialEmisor": {
+                    "type": "string"
+                  },
+                  "municipio": {
+                    "type": "string"
+                  },
+                  "telefono": {
+                    "type": "string"
+                  },
+                  "numeroFactura": {
+                    "type": "integer"
+                  },
+                  "cuf": {
+                    "type": "string"
+                  },
+                  "cufd": {
+                    "type": "string"
+                  },
+                  "codigoSucursal": {
+                    "type": "integer"
+                  },
+                  "direccion": {
+                    "type": "string"
+                  },
+                  "codigoPuntoVenta": {
+                    "type": "integer"
+                  },
+                  "fechaEmision": {
+                    "type": "integer",
+                    "format": "timestamp"
+                  },
+                  "nombreRazonSocial": {
+                    "type": "string"
+                  },
+                  "codigoTipoDocumentoIdentidad": {
+                    "type": "integer"
+                  },
+                  "numeroDocumento": {
+                    "type": "string"
+                  },
+                  "complemento": {
+                    "type": "string"
+                  },
+                  "codigoCliente": {
+                    "type": "string"
+                  },
+                  "modalidadServicio": {
+                    "type": "string"
+                  },
+                  "codigoMetodoPago": {
+                    "type": "integer"
+                  },
+                  "numeroTarjeta": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "montoTotal": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "montoTotalSujetoIva": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "codigoMoneda": {
+                    "type": "integer"
+                  },
+                  "tipoCambio": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "montoTotalMoneda": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "montoGiftCard": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "descuentoAdicional": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "codigoExcepcion": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "cafc": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "leyenda": {
+                    "type": "string"
+                  },
+                  "usuario": {
+                    "type": "string"
+                  },
+                  "codigoDocumentoSector": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "detalle": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "actividadEconomica": {
+                      "type": "string"
+                    },
+                    "codigoProductoSin": {
+                      "type": "integer"
+                    },
+                    "codigoProducto": {
+                      "type": "string"
+                    },
+                    "descripcion": {
+                      "type": "string"
+                    },
+                    "especialidad": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "especialidadDetalle": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "nroQuirofanoSalaOperaciones": {
+                      "type": "integer"
+                    },
+                    "especialidadMedico": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "nombreApellidoMedico": {
+                      "type": "string"
+                    },
+                    "nitDocumentoMedico": {
+                      "type": "integer"
+                    },
+                    "nroMatriculaMedico": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "nroFacturaMedico": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "cantidad": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "unidadMedida": {
+                      "type": "integer"
+                    },
+                    "precioUnitario": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "montoDescuento": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "subTotal": {
+                      "type": "number",
+                      "format": "float"
+                    }
+                  }
+                }
+              },
+              "signature": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "InvoicePDFResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "string",
+            "nullable": true,
+            "description": "PDF en base64 (null en el ejemplo)"
+          }
+        }
+      },
+      "POSDetail": {
+        "type": "object",
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "POS DEFAULT"
+          },
+          "siatCode": {
+            "type": "integer",
+            "example": 0
+          },
+          "siatBranchCode": {
+            "type": "integer",
+            "example": 0
+          },
+          "branchId": {
+            "type": "integer",
+            "example": 1
+          },
+          "siatDescription": {
+            "type": "string",
+            "example": "POS DEFAULT"
+          },
+          "cuis": {
+            "type": "string",
+            "nullable": true,
+            "example": "7CB48412"
+          },
+          "cufd": {
+            "type": "string",
+            "nullable": true,
+            "example": "BQVVCdVU6R0E=NzUQ1NDRFNjA2REY=Qjl+dWxDS0tZVUFc4N0JBQ0I1NkUxM"
+          },
+          "isSync": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "RegeneratedPOS": {
+        "type": "object",
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "POS DEFAULT"
+          },
+          "siatCode": {
+            "type": "integer",
+            "example": 0
+          },
+          "siatBranchCode": {
+            "type": "integer",
+            "example": 0
+          },
+          "branchId": {
+            "type": "integer",
+            "example": 1
+          },
+          "siatDescription": {
+            "type": "string",
+            "example": "POS DEFAULT"
+          },
+          "cuis": {
+            "type": "string",
+            "nullable": true
+          },
+          "cufd": {
+            "type": "string",
+            "nullable": true
+          },
+          "isSync": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "CatalogSyncRequest": {
+        "type": "object",
+        "required": [
+          "posId"
+        ],
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta para sincronización",
+            "example": 1
+          },
+          "branchId": {
+            "type": "integer",
+            "description": "ID de la sucursal (default: 1 si no se especifica)",
+            "example": 1
+          }
+        }
+      },
+      "CatalogFullResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "SINCRO ALL"
+          },
+          "errors": {
+            "type": "null"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "Activities": {
+                "type": "array",
+                "description": "Códigos de Actividades (Agrupador 2)"
+              },
+              "Legends": {
+                "type": "array",
+                "description": "Códigos de Leyendas Facturas (Agrupador 4)"
+              },
+              "ParamCauseAnnulation": {
+                "type": "array",
+                "description": "Códigos de Motivos Anulación (Agrupador 7)"
+              },
+              "ParamDocumentSector": {
+                "type": "array",
+                "description": "Códigos de Tipo Documento Sector (Agrupador 10)"
+              },
+              "MessageSiatErrors": {
+                "type": "array",
+                "description": "Códigos de Mensaje de Errores (Agrupador 5)"
+              },
+              "ParamTypeBedroom": {
+                "type": "array",
+                "description": "Códigos de Tipo Habitación (Agrupador 12)"
+              },
+              "ParamUnitMeasure": {
+                "type": "array",
+                "description": "Códigos de Unidad de Medida (Agrupador 17)"
+              },
+              "ParamPointOfSale": {
+                "type": "array",
+                "description": "Códigos de Tipo Punto de Venta (Agrupador 15)"
+              },
+              "ParamCountry": {
+                "type": "array",
+                "description": "Códigos de País Origen (Agrupador 8)"
+              },
+              "ParamDocumentIdentity": {
+                "type": "array",
+                "description": "Códigos de Tipo Documento Identidad (Agrupador 9)"
+              },
+              "ParamTypeCurrency": {
+                "type": "array",
+                "description": "Códigos de Tipo Moneda (Agrupador 14)"
+              },
+              "ProductService": {
+                "type": "array",
+                "description": "Códigos de Productos y Servicios (Agrupador 1)"
+              },
+              "ParamTypeEmission": {
+                "type": "array",
+                "description": "Códigos de Tipo Emisión (Agrupador 11)"
+              },
+              "ParamTypeInvoice": {
+                "type": "array",
+                "description": "Códigos de Tipo Factura (Agrupador 16)"
+              },
+              "ActivitiesDocumentSector": {
+                "type": "array",
+                "description": "Códigos de Actividades Documento Sector (Agrupador 3)"
+              },
+              "ParamEventSignificant": {
+                "type": "array",
+                "description": "Códigos de Eventos Significativos (Agrupador 6)"
+              },
+              "ParamMethodPayment": {
+                "type": "array",
+                "description": "Códigos de Tipo Método Pago (Agrupador 13)"
+              }
+            }
+          }
+        }
+      },
+      "CatalogGroupResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "COMPLETED"
+          },
+          "errors": {
+            "type": "null"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "codeType": {
+                    "type": "string",
+                    "description": "Código del item en el catálogo"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Descripción del item"
+                  }
+                },
+                "example": {
+                  "codeType": "1",
+                  "description": "PUNTO VENTA COMISIONISTA"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CatalogGroup": {
+        "type": "object",
+        "properties": {
+          "groupId": {
+            "type": "integer",
+            "description": "ID del agrupador",
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del servicio asociado al agrupador"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción del agrupador"
+          }
+        },
+        "example": {
+          "groupId": 15,
+          "name": "ParamPointOfSale",
+          "description": "Códigos de Tipo Punto de Venta"
+        }
+      },
+      "InvoiceConfigRequest": {
+        "type": "object",
+        "properties": {
+          "colorPrimary": {
+            "type": "string",
+            "description": "Color Primario para las letras (valor hexadecimal)",
+            "example": "#ff5729"
+          },
+          "colorBorder": {
+            "type": "string",
+            "description": "Color para el borde (valor hexadecimal)",
+            "example": "#ff972a"
+          },
+          "colorShadow": {
+            "type": "string",
+            "description": "Color para el fondo de los montos (valor hexadecimal)",
+            "example": "#ffffef"
+          },
+          "fontType": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "description": "Tipo de fuente (1=OVERPASS, 2=COURIER_STD, 3=COURIER_PRIME, 4=NOTO_SANS_MONO)"
+          },
+          "isBorder": {
+            "type": "boolean",
+            "description": "Habilitar o deshabilitar borde en la factura"
+          }
+        },
+        "required": [
+          "colorPrimary",
+          "colorBorder",
+          "colorShadow",
+          "fontType",
+          "isBorder"
+        ]
+      },
+      "InvoiceConfigResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "colorPrimary": {
+                "type": "string"
+              },
+              "colorBorder": {
+                "type": "string"
+              },
+              "colorShadow": {
+                "type": "string"
+              },
+              "logo": {
+                "type": "string",
+                "nullable": true
+              },
+              "fontType": {
+                "type": "string",
+                "enum": [
+                  "OVERPASS",
+                  "COURIER_STD",
+                  "COURIER_PRIME",
+                  "NOTO_SANS_MONO"
+                ]
+              },
+              "isBorder": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "InvoiceRequest": {
+        "type": "object",
+        "required": [
+          "posId",
+          "branchId",
+          "clientReasonSocial",
+          "clientDocumentType",
+          "clientNroDocument",
+          "clientCode",
+          "paramPaymentMethod",
+          "userPos",
+          "typeInvoice",
+          "paramCurrency",
+          "clientCity",
+          "clientEmail"
+        ],
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta",
+            "default": "1"
+          },
+          "branchId": {
+            "type": "integer",
+            "description": "Id sucursal",
+            "default": "1"
+          },
+          "clientReasonSocial": {
+            "type": "string",
+            "description": "Razón Social del cliente",
+            "default": "CONTROL TRIBUTARIO"
+          },
+          "clientDocumentType": {
+            "type": "string",
+            "description": "Autogenerado desde catálogos por el agrupador 9. (Valor que identifica el Tipo de Documento utilizado para la emisión de la factura)",
+            "default": "5"
+          },
+          "clientNroDocument": {
+            "type": "String",
+            "description": "Número que corresponde al Tipo de Documento Identidad utilizado y al cual se realizará la facturación.",
+            "default": "99002"
+          },
+          "clientCode": {
+            "type": "string",
+            "description": "Código de identificación único del cliente, deberá ser asignado por el sistema de facturación del contribuyente.",
+            "default": "CONTROL TRIBUTARIO"
+          },
+          "paramPaymentMethod": {
+            "type": "integer",
+            "description": "Autogenerado desde catálogos por el agrupador 13. (Valor que identifica el método de pago. Por ejemplo 1 es efectivo).",
+            "default": "1"
+          },
+          "userPos": {
+            "type": "string",
+            "description": "Identifica al usuario que emite la factura, deberá ser descriptivo. Por ejemplo JPEREZ.",
+            "default": "TEST"
+          },
+          "typeInvoice": {
+            "type": "integer",
+            "description": "Tipo de la factura, valores permitidos: 1 = Factura con Derecho a Crédito Fiscal 2 = Factura sin Derecho a Crédito Fiscal 3 = Documento de Ajuste",
+            "default": "1"
+          },
+          "paramCurrency": {
+            "type": "integer",
+            "description": "Autogenerado desde catálogos por el agrupador 14. (Valor que identifica la moneda).",
+            "default": "1"
+          },
+          "clientComplement": {
+            "type": "string",
+            "description": "Complemento de cliente."
+          },
+          "clientCity": {
+            "type": "string",
+            "description": "Ciudad del cliente.",
+            "default": "LA PAZ"
+          },
+          "exceptionCode": {
+            "type": "integer",
+            "description": "Valor que se envía para autorizar el registro de una factura con NIT inválido. Enviar uno (1) cuando se autorice el registro."
+          },
+          "numberCard": {
+            "type": "string",
+            "description": "Cuando el método de pago es 2 (Tarjeta), debe enviarse este valor."
+          },
+          "giftCard": {
+            "type": "integer",
+            "description": "Monto a ser cancelado con una Gift Card."
+          },
+          "clientEmail": {
+            "type": "string",
+            "description": "Email del cliente.",
+            "default": "test@gmail.com"
+          },
+          "additionalDiscount": {
+            "type": "integer",
+            "description": "Monto Adicional al descuento por item"
+          },
+          "detailInvoice": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceDetail"
+            }
+          }
+        }
+      },
+      "InvoiceRequestRate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InvoiceRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "exchangeRate": {
+                "type": "number",
+                "description": "Tipo de cambio de la moneda"
+              },
+              "amountUsd": {
+                "type": "number",
+                "description": "Monto en dólares"
+              },
+              "observations": {
+                "type": "string",
+                "description": "Observaciones adicionales"
+              }
+            },
+            "required": [
+              "exchangeRate"
+            ]
+          }
+        ]
+      },
+      "InvoiceRequestFreeZone": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InvoiceRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "typeChange": {
+                "type": "number",
+                "description": "Tipo de cambio de la moneda"
+              },
+              "amountUsd": {
+                "type": "number",
+                "description": "Monto en dólares"
+              },
+              "observations": {
+                "type": "string",
+                "description": "Observaciones adicionales"
+              },
+              "receptionPartyNumber": {
+                "type": "string",
+                "description": "Número otorgado a la recepción de la mercadería (Manifiesto de Carga)"
+              }
+            },
+            "required": [
+              "typeChange"
+            ]
+          }
+        ]
+      },
+      "InvoiceRequestExportServices": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InvoiceRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "exchangeRate": {
+                "type": "number",
+                "description": "Tipo de cambio de la moneda"
+              },
+              "amountUsd": {
+                "type": "number",
+                "description": "Monto en dólares"
+              },
+              "observations": {
+                "type": "string",
+                "description": "Observaciones adicionales"
+              },
+              "buyerAddress": {
+                "type": "string",
+                "description": "Dirección donde se está exportando."
+              },
+              "destinationPlace": {
+                "type": "string",
+                "description": "Lugar al cual se está realizando la exportación."
+              },
+              "codeCountry": {
+                "type": "integer",
+                "description": "Autogenerado desde catálogos por el agrupador 8. (Valor que identifica el código de pais)."
+              }
+            },
+            "required": [
+              "exchangeRate",
+              "buyerAddress",
+              "destinationPlace",
+              "codeCountry"
+            ]
+          }
+        ]
+      },
+      "InvoiceRequestHospital": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InvoiceRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "serviceMode": {
+                "type": "string",
+                "description": "Servicio que se otorga al paciente, por ejemplo: Post Operatorio."
+              },
+              "detailInvoice": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/InvoiceDetail"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "specialty": {
+                          "type": "string",
+                          "description": "Especialidad de la atención que brinda el servicio"
+                        },
+                        "specialtyDetail": {
+                          "type": "string",
+                          "description": "Descripción de la especialidad brindada"
+                        },
+                        "nroOperatingRoom": {
+                          "type": "integer",
+                          "description": "Número de quirófano en caso de cirugías"
+                        },
+                        "specialtyDoctor": {
+                          "type": "string",
+                          "description": "Especialidad del médico que brinda el servicio"
+                        },
+                        "nameLastNameDoctor": {
+                          "type": "string",
+                          "description": "Nombre completo del médico que brinda el servicio"
+                        },
+                        "nitDocumentDoctor": {
+                          "type": "integer",
+                          "description": "Número de NIT del médico"
+                        },
+                        "nroRegisterDoctor": {
+                          "type": "string",
+                          "description": "Número de matrícula del médico"
+                        },
+                        "nroInvoiceDoctor": {
+                          "type": "integer",
+                          "description": "Número de la factura emitida por el médico"
+                        }
+                      },
+                      "required": [
+                        "specialty",
+                        "specialtyDetail",
+                        "nroRegisterDoctor",
+                        "nroInvoiceDoctor"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "serviceMode"
+            ]
+          }
+        ]
+      },
+      "InvoiceRequestDebit": {
+        "type": "object",
+        "required": [
+          "posId",
+          "invoiceNumber",
+          "invoiceCode",
+          "userPos",
+          "detailInvoice"
+        ],
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta",
+            "example": 1
+          },
+          "invoiceNumber": {
+            "type": "integer",
+            "description": "Número de factura original que se está debitando",
+            "example": 3542
+          },
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código único de la factura original",
+            "example": "20A8C955"
+          },
+          "userPos": {
+            "type": "string",
+            "description": "Usuario que realiza la operación de débito",
+            "example": "USERNEW123"
+          },
+          "detailInvoice": {
+            "type": "array",
+            "description": "Detalle de los productos/servicios a debitar",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/InvoiceDetail"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "returnProduct"
+                  ],
+                  "properties": {
+                    "returnProduct": {
+                      "type": "boolean",
+                      "description": "Indica si el producto debe ser devuelto físicamente",
+                      "example": true
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "InvoiceDetail": {
+        "type": "object",
+        "required": [
+          "activityEconomic",
+          "unitMeasure",
+          "codeProductSin",
+          "codeProduct",
+          "description",
+          "qty",
+          "priceUnit"
+        ],
+        "properties": {
+          "activityEconomic": {
+            "type": "string",
+            "description": "Código de actividad económica"
+          },
+          "unitMeasure": {
+            "type": "integer",
+            "description": "Autogenerado desde catálogos por el agrupador 17. (Valor que identifica la unidad de medida)."
+          },
+          "codeProductSin": {
+            "type": "string",
+            "description": "Homologado a los códigos de productos genéricos enviados por impuestos (ver agrupador 1 de catálogos)."
+          },
+          "codeProduct": {
+            "type": "string",
+            "description": "Código interno del producto"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción que otorga el contribuyente a su servicio o producto."
+          },
+          "qty": {
+            "type": "integer",
+            "description": "Cantidad del producto o servicio otorgado. En caso de servicio este valor debe ser 1."
+          },
+          "priceUnit": {
+            "type": "number",
+            "format": "double",
+            "description": "Precio que otorga el contribuyente a su servicio o producto.(puede contener decimales ejem. 9.99)"
+          },
+          "amountDiscount": {
+            "type": "number",
+            "format": "double",
+            "description": "Monto de descuento sobre el producto o servicio específico, Si no aplica deberá ser nulo."
+          },
+          "numberSerial": {
+            "type": "integer",
+            "description": "Número de serie correspondiente al producto vendido de línea blanca o negra. Nulo en otro caso."
+          },
+          "numberImei": {
+            "type": "integer",
+            "description": "Número de Imei del celular vendido, nulo en otro caso."
+          }
+        }
+      },
+      "InvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "amountTotal": {
+            "type": "integer",
+            "description": "Monto total por el cual se realiza el hecho generador."
+          },
+          "amountTotalDiscount": {
+            "type": "integer",
+            "description": "Monto Adicional al descuento por item."
+          },
+          "siatCodeState": {
+            "type": "integer",
+            "description": "Código de estado."
+          },
+          "siatCodeReception": {
+            "type": "string",
+            "description": "Código de recepción."
+          },
+          "siatDescriptionStatus": {
+            "type": "string",
+            "description": "Descripción del estado"
+          },
+          "invoiceXml": {
+            "type": "string",
+            "description": "XML de la factura firmada"
+          },
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código corto de la factura (invoiceCode)."
+          },
+          "qrCode": {
+            "type": "string",
+            "description": "URL del código QR para validación"
+          },
+          "invoiceUrl": {
+            "type": "string",
+            "description": "Ruta publica de la factura."
+          }
+        }
+      },
+      "InvoiceResponseAnulate": {
+        "type": "object",
+        "properties": {
+          "invoiceNumber": {
+            "type": "integer",
+            "description": "Número de factura emitida."
+          },
+          "cuf": {
+            "type": "string",
+            "description": "Código único de factura."
+          },
+          "siatCodeState": {
+            "type": "integer",
+            "description": "Código de estado enviado por el SIN."
+          },
+          "siatDescriptionStatus": {
+            "type": "string",
+            "description": "Descripción del estado"
+          },
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código corto de la factura (invoiceCode)."
+          },
+          "qrCode": {
+            "type": "string",
+            "description": "URL del código QR para validación"
+          }
+        }
+      },
+      "InvoiceRequestAnulate": {
+        "type": "object",
+        "required": [
+          "posId",
+          "branchId",
+          "invoiceCode",
+          "codeMotive",
+          "invoiceNumber"
+        ],
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta"
+          },
+          "branchId": {
+            "type": "integer",
+            "description": "Id sucursal"
+          },
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código de factura que está siendo anulado."
+          },
+          "codeMotive": {
+            "type": "integer",
+            "description": "Autogenerado desde catálogos por el agrupador 7. (Indica el motivo por el cual la Factura está siendo anulada)."
+          },
+          "invoiceNumber": {
+            "type": "integer",
+            "description": "Número de factura que está siendo anulado."
+          }
+        }
+      },
+      "StartEventRequest": {
+        "type": "object",
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta"
+          },
+          "branchId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "ID de la sucursal"
+          },
+          "codeMotive": {
+            "type": "integer",
+            "description": "Código del motivo (ver agrupador 6 de catálogos)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción del evento significativo"
+          },
+          "dateInitEvent": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Fecha de inicio del evento (opcional)"
+          },
+          "dateEndEvent": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Fecha de finalización del evento (opcional)"
+          }
+        },
+        "required": [
+          "posId",
+          "codeMotive",
+          "description"
+        ]
+      },
+      "EventResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "descriptionMotive": {
+                "type": "string"
+              },
+              "eventCode": {
+                "type": "string"
+              },
+              "dateInitEvent": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "dateEndEvent": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "siatReceptionCode": {
+                "type": "integer",
+                "nullable": true
+              },
+              "cufEvent": {
+                "type": "string"
+              },
+              "controlCodeEvent": {
+                "type": "string"
+              },
+              "cafc": {
+                "type": "string",
+                "nullable": true
+              },
+              "codeMotive": {
+                "type": "integer"
+              },
+              "isEndEvent": {
+                "type": "boolean",
+                "nullable": true
+              },
+              "pack": {
+                "type": "array",
+                "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "EndEventRequest": {
+        "type": "object",
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta"
+          },
+          "eventCode": {
+            "type": "string",
+            "description": "Código asignado al evento"
+          }
+        },
+        "required": [
+          "posId",
+          "eventCode"
+        ]
+      },
+      "EndEventResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "packageId": {
+                  "type": "integer"
+                },
+                "siatStatusDescription": {
+                  "type": "string"
+                },
+                "siatStatus": {
+                  "type": "integer"
+                },
+                "siatCodeReception": {
+                  "type": "string"
+                },
+                "docSector": {
+                  "type": "integer"
+                },
+                "typeInvoice": {
+                  "type": "integer"
+                },
+                "process": {
+                  "type": "boolean"
+                },
+                "posId": {
+                  "type": "integer"
+                },
+                "branchId": {
+                  "type": "integer"
+                },
+                "crc32": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "EmailRequest": {
+        "type": "object",
+        "properties": {
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código corto de la factura"
+          },
+          "sendEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "Dirección de correo electrónico destino"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Asunto del correo electrónico"
+          }
+        },
+        "required": [
+          "invoiceCode",
+          "sendEmail",
+          "subject"
+        ]
+      },
+      "EmailResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "sendEmail": {
+                "type": "string",
+                "format": "email"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "invoiceCode": {
+                "type": "string"
+              },
+              "cuf": {
+                "type": "string",
+                "description": "Código Único de Factura"
+              },
+              "invoiceNumber": {
+                "type": "string",
+                "description": "Número de factura"
+              }
+            }
+          }
+        }
+      },
+      "InvoiceRequestRevert": {
+        "type": "object",
+        "required": [
+          "posId",
+          "branchId",
+          "invoiceCode",
+          "invoiceNumber"
+        ],
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta"
+          },
+          "branchId": {
+            "type": "integer",
+            "description": "Id sucursal"
+          },
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código de factura que está siendo revertido."
+          },
+          "invoiceNumber": {
+            "type": "integer",
+            "description": "Número de factura que está siendo revertido."
+          }
+        }
+      },
+      "Error": {
         "type": "object",
         "properties": {
           "error": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "message": {
             "type": "string"
           }
         }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
       }
     }
   }

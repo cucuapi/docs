@@ -11,117 +11,198 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
+            "group": "API Documentation",
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Requisitos",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/requisitos",
+              "api-reference/solicitud"
+            ]
+          },
+          {
+            "group": "Endpoint Configuration",
+            "pages": [
+              "api-reference/endpoint/login-auth",
+              {
+                "group": "Branch Office",
+                "pages": [
+                  "api-reference/endpoint/branch-office/create-branch-office",
+                  "api-reference/endpoint/branch-office/get-branch-office",
+                  "api-reference/endpoint/branch-office/get-one-branch-office",
+                  "api-reference/endpoint/branch-office/put-branch-office"
+                ]
+              },
+              {
+                "group": "Point Of Sale",
+                "pages": [
+                  "api-reference/endpoint/pos/pos-post",
+                  "api-reference/endpoint/pos/pos-get",
+                  "api-reference/endpoint/pos/pos-regenerate"
+                ]
+              },
+              {
+                "group": "Catalogs",
+                "pages": [
+                  "api-reference/endpoint/catalogs/catalog-post",
+                  "api-reference/endpoint/catalogs/catalog-get"
+                ]
+              },
+              {
+                "group": "Config Invoice",
+                "pages": [
+                  "api-reference/endpoint/config-invoice/config-invoice-post",
+                  "api-reference/endpoint/config-invoice/config-invoice-put",
+                  "api-reference/endpoint/config-invoice/config-logo",
+                  "api-reference/endpoint/config-invoice/config-firma",
+                  "api-reference/endpoint/config-invoice/config-token",
+                  "api-reference/endpoint/config-invoice/config-cache"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Endpoint Invoice",
+            "pages": [
+              {
+                "group": "Invoice Sale",
+                "pages": [
+                  "api-reference/endpoint/invoice-sale/invoice-sale",
+                  "api-reference/endpoint/invoice-sale/invoice-sale-anulation",
+                  "api-reference/endpoint/invoice-sale/invoice-sale-revert"
+                ]
+              },
+              {
+                "group": "Invoice Sale Bonuses",
+                "pages": [
+                  "api-reference/endpoint/invoice-sale-bon/invoice-sale-bon",
+                  "api-reference/endpoint/invoice-sale-bon/invoice-sale-bon-anulation",
+                  "api-reference/endpoint/invoice-sale-bon/invoice-sale-bon-revert"
+                ]
+              },
+              {
+                "group": "Note Debit",
+                "pages": [
+                  "api-reference/endpoint/note-debit/note-debit",
+                  "api-reference/endpoint/note-debit/note-debit-anulation",
+                  "api-reference/endpoint/note-debit/note-debit-revert"
+                ]
+              },
+              {
+                "group": "Invoice Rate",
+                "pages": [
+                  "api-reference/endpoint/invoice-rate/invoice-rate",
+                  "api-reference/endpoint/invoice-rate/invoice-rate-anulation",
+                  "api-reference/endpoint/invoice-rate/invoice-rate-revert"
+                ]
+              },
+              {
+                "group": "Invoice Export Services",
+                "pages": [
+                  "api-reference/endpoint/invoice-export/invoice-export",
+                  "api-reference/endpoint/invoice-export/invoice-export-anulation",
+                  "api-reference/endpoint/invoice-export/invoice-export-revert"
+                ]
+              },
+              {
+                "group": "Invoice Hospital",
+                "pages": [
+                  "api-reference/endpoint/invoice-hospital/invoice-hospital",
+                  "api-reference/endpoint/invoice-hospital/invoice-hospital-anulation",
+                  "api-reference/endpoint/invoice-hospital/invoice-hospital-revert"
+                ]
+              },
+              {
+                "group": "Invoice Free Zone",
+                "pages": [
+                  "api-reference/endpoint/invoice-free-zone/invoice-free-zone",
+                  "api-reference/endpoint/invoice-free-zone/invoice-free-zone-anulation",
+                  "api-reference/endpoint/invoice-free-zone/invoice-free-zone-revert"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Endpoint Services",
+            "pages": [
+              {
+                "group": "List Invoices",
+                "pages": [
+                  "api-reference/endpoint/other-services/service-pagination",
+                  "api-reference/endpoint/other-services/service-json",
+                  "api-reference/endpoint/other-services/service-xml",
+                  "api-reference/endpoint/other-services/service-pdf"
+                ]
+              },
+              {
+                "group": "Event Significant",
+                "pages": [
+                  "api-reference/endpoint/other-services/service-event-start",
+                  "api-reference/endpoint/other-services/service-event-end"
+                ]
+              },
+              "api-reference/endpoint/other-services/service-email"
+            ]
+          },
+          {
+            "group": "Archivos Pdf",
+            "pages": [
+              "api-reference/pdf"
+            ]
+          },
+          {
+            "group": "Políticas",
+            "pages": [
+              "api-reference/politica-privacidad"
             ]
           }
+
         ]
       }
     ],
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "API youtube",
+          "href": "https://www.youtube.com/channel/UCeSrc9FUnBMCPHfp-dmzMKw",
+          "icon": "play"
         },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
+         {
+        "anchor": "Email Support",
+        "href": "mailto:api@cucu.bo",
+        "icon": "book-open-cover"
+      },
+      {
+        "anchor": "Slack",
+        "href": "https://app.slack.com/client/T034CF04H17",
+        "icon": "slack"
+      }
       ]
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
+    
     "primary": {
       "type": "button",
       "label": "Dashboard",
       "href": "https://dashboard.mintlify.com"
     }
   },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "twitter": "https://www.tiktok.com/@cucuapi",
+      "facebook": "https://www.facebook.com/cucuapi/",
+      "youtube": "https://www.youtube.com/channel/UCeSrc9FUnBMCPHfp-dmzMKw"
     }
   }
 }

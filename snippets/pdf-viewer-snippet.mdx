@@ -1,0 +1,12 @@
+export const PdfViewer = ({ route, title }) => {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", padding: "1rem 0" }}>
+      <iframe
+        src={route}
+        title={title}
+        frameBorder="0"
+        style={{ width: "100%", height: "600px" }}
+      ></iframe>
+    </div>
+  );
+};

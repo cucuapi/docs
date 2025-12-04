@@ -1,33 +1,54 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'API REST de Facturación Electrónica v1.0.0 pertenece a CUCU, es un servicio de emisión y control de facturas de forma automática de acuerdo a la normativa de Impuestos Nacionales, trabaja juntamente con su sistema SIN `Sistema de Impuestos Nacionales`.'
 ---
+<div className="flex justify-center my-8">
+<img
+    className="hidden dark:block w-[150px] h-auto border border-gray-200"
+    src="/images/icon_cucu.png"
+    alt="Hero Dark"
+/>
+</div>
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Welcome to API REST de Facturación en linea
 
-## Welcome
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+## Información general de la API
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
+| Titulo         | **Api Rest Cucu Facturación en Línea** |
+| -------------- | -------------------------------------- |
+| Versión        | v1.0.0                                 |
+| Protocolo      | HTTPS                                  |
+| Demo URL       | https://sandbox.cucu.bo/api/v1         |
+| Producción URL | https://api.cucu.bo/api/v1             |
+
+## Modalidad de Facturación en Línea
+
+| Modalidad     | Endpoint              | Descripción                        |
+| ------------- | --------------------- | ---------------------------------- |
+| Electrónica   | /invoice/electronic   | Facturación electrónica en línea   |
+| Computarizada | /invoice/computarized | Facturación computarizada en línea |
+
+
+
+<Card title="REST API Base URL" icon="link">
+  https://sandbox.cucu.bo/api/v1
 </Card>
+
+
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+Todos los endpoints de la API requieren autenticación mediante headers personalizados:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+headers: {
+  'Content-Type': 'application/json', 
+  cucukey: 'Token eyJhbGciOiJIUzUxMiJ9...'
+  },
 ```
+
+<Note>
+  La URL Base contiene información de todos los **endpoint** disponibles al cliente. Todas la solicitudes son efectuadas con el protocolo **`https`**. Las respuestas se devolverán bajo el formato **`json`**.
+</Note>
+
