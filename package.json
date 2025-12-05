@@ -1,9 +1,8 @@
 {
   "name": "docs",
   "version": "1.0.0",
-  "description": "Documentación Mintlify para AWS Amplify",
+  "description": "Documentación Mintlify",
   "scripts": {
-    "build": "mintlify build",
     "dev": "mintlify dev"
   },
   "devDependencies": {
