@@ -6,7 +6,17 @@ frontend:
         - npm install
     # IMPORTANT - Please verify your build commands
     build:
-      commands: []
+      commands:
+        - mkdir -p dist
+        - cp -r api-reference dist/ || true
+        - cp -r essentials dist/ || true
+        - cp -r images dist/ || true
+        - cp -r logo dist/ || true
+        - cp -r snippets dist/ || true
+        - cp *.mdx dist/ || true
+        - cp *.json dist/ || true
+        - cp *.svg dist/ || true
+        - echo '<!DOCTYPE html><html><head><title>Mintlify Docs</title></head><body><h1>Mintlify Documentation</h1><p>Este sitio requiere la plataforma Mintlify para funcionar correctamente.</p><p>Los archivos .mdx necesitan ser procesados por Next.js.</p></body></html>' > dist/index.html
   artifacts:
     baseDirectory: dist
     files:
