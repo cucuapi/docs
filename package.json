@@ -1,12 +1,16 @@
 {
   "name": "docs",
   "version": "1.0.0",
-  "private": true,
+  "description": "Documentación Mintlify para AWS Amplify",
   "scripts": {
-    "dev": "mintlify dev",
-    "build": "mintlify build"
+    "build": "mintlify build",
+    "dev": "mintlify dev"
   },
-  "dependencies": {
-    "@mintlify/cli": "3.0.111"
+  "devDependencies": {
+    "mintlify": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
+
