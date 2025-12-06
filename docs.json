@@ -203,6 +203,10 @@
       "twitter": "https://www.tiktok.com/@cucuapi",
       "facebook": "https://www.facebook.com/cucuapi/",
       "youtube": "https://www.youtube.com/channel/UCeSrc9FUnBMCPHfp-dmzMKw"
+    },
+    "poweredBy": {
+      "name": "cucu",
+      "url": "https://cucu.bo/"
     }
   }
 }
