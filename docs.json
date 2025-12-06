@@ -187,8 +187,8 @@
     }
   },
   "logo": {
-    "light": "/logo/logo-vertical.png",
-    "dark": "/logo/logo-vertical.png"
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
   },
   "navbar": {
     
